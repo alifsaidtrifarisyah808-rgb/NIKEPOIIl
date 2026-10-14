@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NontonKu — Video</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b0b0f;color:#fff;font-family:Arial,sans-serif}
+header{position:sticky;top:0;z-index:5;background:#111116;border-bottom:1px solid #292930;padding:14px 5%;display:flex;align-items:center;gap:24px}
+.logo{font-size:24px;font-weight:800;color:#ff3b5c}.search{flex:1;max-width:500px;background:#202027;border:1px solid #33333c;color:#fff;border-radius:22px;padding:11px 17px;outline:none}
+.container{width:min(1200px,90%);margin:28px auto}.hero{background:linear-gradient(135deg,#1b1b25,#101015);border-radius:18px;padding:30px;margin-bottom:30px}
+.hero h1{font-size:34px;margin:0 0 8px}.hero p{color:#aaa;margin:0}
+.categories{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}.cat{border:0;border-radius:20px;padding:9px 16px;background:#202027;color:#ddd;cursor:pointer}.cat.active,.cat:hover{background:#ff3b5c;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}.card{background:#15151b;border-radius:14px;overflow:hidden;cursor:pointer;transition:.2s}.card:hover{transform:translateY(-4px);background:#1d1d25}.thumb{height:135px;background:linear-gradient(135deg,#272735,#17171e);display:flex;align-items:center;justify-content:center;font-size:42px}.info{padding:13px}.title{font-weight:700;margin-bottom:6px}.meta{font-size:13px;color:#999}
+.player{display:none;margin-top:25px}.player video{width:100%;max-height:650px;background:#000;border-radius:14px}.back{margin:15px 0;color:#ff5a73;cursor:pointer}.empty{color:#888;padding:30px 0}
+footer{text-align:center;color:#777;padding:45px}
+@media(max-width:600px){.hero h1{font-size:26px}header{gap:10px}.logo{font-size:20px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">NontonKu</div>
+  <input id="search" class="search" placeholder="Cari video...">
+</header>
+
+<main class="container">
+  <section class="hero">
+    <h1>Temukan video favoritmu 🎬</h1>
+    <p>Template website video sederhana. Ganti video dan judul sesuai kebutuhanmu.</p>
+  </section>
+
+  <div class="categories">
+    <button class="cat active" data-cat="Semua">Semua</button>
+    <button class="cat" data-cat="Gaming">Gaming</button>
+    <button class="cat" data-cat="Tutorial">Tutorial</button>
+    <button class="cat" data-cat="Hiburan">Hiburan</button>
+  </div>
+
+  <section id="grid" class="grid"></section>
+
+  <section id="player" class="player">
+    <div class="back" onclick="closePlayer()">← Kembali ke daftar</div>
+    <video id="videoPlayer" controls></video>
+    <h2 id="playerTitle"></h2>
+    <p id="playerDesc" style="color:#aaa"></p>
+  </section>
+</main>
+
+<footer>© 2026 NontonKu</footer>
+
+<script>
+const videos = [
+  {title:"Video Gaming Pertama",cat:"Gaming",file:"videos/video1.mp4",desc:"Tambahkan video gaming kamu di folder videos."},
+  {title:"Tutorial Pertama",cat:"Tutorial",file:"videos/video2.mp4",desc:"Tambahkan video tutorial kamu di folder videos."},
+  {title:"Video Hiburan",cat:"Hiburan",file:"videos/video3.mp4",desc:"Tambahkan video hiburan kamu di folder videos."},
+  {title:"Video Gaming Kedua",cat:"Gaming",file:"videos/video4.mp4",desc:"Video lainnya."}
+];
+
+const grid=document.getElementById("grid"), search=document.getElementById("search");
+let category="Semua";
+
+function render(){
+  const q=search.value.toLowerCase();
+  const list=videos.filter(v=>
+    (category==="Semua"||v.cat===category) &&
+    v.title.toLowerCase().includes(q)
+  );
+  grid.innerHTML=list.length?list.map((v,i)=>`
+    <article class="card" onclick="openPlayer(${videos.indexOf(v)})">
+      <div class="thumb">▶</div>
+      <div class="info"><div class="title">${v.title}</div><div class="meta">${v.cat}</div></div>
+    </article>`).join(""):`<div class="empty">Video tidak ditemukan.</div>`;
+}
+function openPlayer(i){
+  const v=videos[i];
+  document.getElementById("videoPlayer").src=v.file;
+  document.getElementById("playerTitle").textContent=v.title;
+  document.getElementById("playerDesc").textContent=v.desc;
+  grid.style.display="none";
+  document.querySelector(".categories").style.display="none";
+  document.querySelector(".hero").style.display="none";
+  document.getElementById("player").style.display="block";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function closePlayer(){
+  const p=document.getElementById("videoPlayer");p.pause();p.src="";
+  document.getElementById("player").style.display="none";
+  grid.style.display="grid";
+  document.querySelector(".categories").style.display="flex";
+  document.querySelector(".hero").style.display="block";
+}
+document.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); category=b.dataset.cat; render();
+});
+search.addEventListener("input",render);
+render();
+</script>
+</body>
+</html>
